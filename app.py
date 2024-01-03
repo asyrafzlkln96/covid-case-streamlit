@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 
 URL_DATA = 'https://storage.data.gov.my/healthcare/covid_cases_vaxstatus.parquet'
@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 st.title("Covid Cases based on MoH data")
-st.sidebar.success("Select a page above")
+# st.sidebar.success("Select a page above")
 
 st.markdown("This app scrapes data from MoH API and displays the number of new Covid cases in Malaysia.")
 
@@ -85,8 +85,15 @@ st.dataframe(
     },
     hide_index=True,
 )
+st.markdown("Visualization of Case")
 
-# Plot bar plot using matplotlib for convenience
-fig, ax = plt.subplots()
-filtered_df[['cases_unvaccinated', 'cases_partially_vaccinated', 'cases_fully_vaccinated', 'cases_booster']].plot(kind='bar', ax=ax)
-st.pyplot(fig)
+# Plot interactive line chart for cases over time
+fig = px.line(filtered_df, x='date', y=['cases_unvax', 'cases_pvax', 'cases_fvax', 'cases_boost','total_cases'],
+              labels={'value': 'Number of Cases', 'variable': 'Vaccination Status'},
+              title='Cases Over Time by Vaccination Status')
+
+# Add hover information
+fig.update_layout(hovermode='x unified', hoverlabel=dict(bgcolor="white", font_size=12))
+
+# Display the interactive plot
+st.plotly_chart(fig)
